@@ -94,6 +94,14 @@ class PPInternalData_2DDiscrete(PPInternalData):
         ppKernels.zero_field(self.deposit_field)
         ppKernels.zero_field(self.trace_field)
         ppKernels.zero_field(self.vis_field)
+        self.E_field[None] = 0.0
+        self.V_field[None] = 0.0
+        self.Etot_field[None] = 0.0
+        self.Mtot_field[None] = 0.0
+        self.Emax_field[None][0] = 0.0
+        self.VEmin_field[None][0] = 1e6
+        self.Emax_field[None][1] = 0.0
+        self.VEmin_field[None][1] = 0.0
 
     # Insert a new data point, Round-Robin style, and upload to GPU
     # This can be very costly for many data points! (eg 10^5 or more)
@@ -149,6 +157,12 @@ class PPInternalData_2DDiscrete(PPInternalData):
                                            shape=ppConfig.TRACE_RESOLUTION)
         self.vis_field = ti.Vector.field(n=3, dtype=PPTypes.FLOAT_GPU,
                                          shape=ppConfig.VIS_RESOLUTION)
+        self.E_field = ti.field(dtype=PPTypes.FLOAT_GPU,shape=())
+        self.V_field = ti.field(dtype=PPTypes.FLOAT_GPU,shape=())
+        self.Etot_field = ti.field(dtype=PPTypes.FLOAT_GPU,shape=())
+        self.Mtot_field = ti.field(dtype=PPTypes.FLOAT_GPU,shape=())
+        self.Emax_field = ti.Vector.field(n=2, dtype=PPTypes.FLOAT_GPU,shape=())
+        self.VEmin_field = ti.Vector.field(n=2, dtype=PPTypes.FLOAT_GPU,shape=())
         Logger.logToStdOut("info", 'Total GPU memory allocated:',
                            PPTypes.INT_CPU(
                                4 * (self.data_field.shape[0] * 3 + self.agents_field.shape[0] * 4 + self.deposit_field.shape[0] * self.deposit_field.shape[1] * 2 + self.trace_field.shape[0] * self.trace_field.shape[1] * 1 + self.vis_field.shape[0] * self.vis_field.shape[1] * 3
